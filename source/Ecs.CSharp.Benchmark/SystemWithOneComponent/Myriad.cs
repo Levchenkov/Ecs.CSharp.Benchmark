@@ -21,7 +21,7 @@ namespace Ecs.CSharp.Benchmark
                 ++t0.Value;
             }
 
-            public void Execute(ChunkHandle chunk, ReadOnlySpan<Entity> e, Span<Component1> t0)
+            public void Execute(ChunkHandle chunk, Span<Component1> t0)
             {
                 for (int i = 0; i < t0.Length; i++)
                 {
@@ -69,7 +69,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThread()
         {
             World world = _myriad.World;
-            world.Execute<MyriadForEach1, Component1>(new MyriadForEach1());
+            world.Execute<MyriadForEach1, Component1>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -85,7 +85,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThreadChunk()
         {
             World world = _myriad.World;
-            world.ExecuteChunk<MyriadForEach1, Component1>(new MyriadForEach1());
+            world.ExecuteChunk<MyriadForEach1, Component1>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
