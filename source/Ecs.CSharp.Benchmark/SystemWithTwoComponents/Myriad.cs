@@ -48,12 +48,11 @@ namespace Ecs.CSharp.Benchmark
             // always sequential in memory no matter what else is attached to the entity. So no need to respect
             // the padding input
             public MyriadContext(int entityCount, int _)
-                : base()
             {
                 CommandBuffer cmd = new CommandBuffer(World);
                 for (int i = 0; i < entityCount; i++)
                 {
-                    CommandBuffer.BufferedEntity e = cmd.Create().Set(new Component1()).Set(new Component2());
+                    cmd.Create().Set(new Component1()).Set(new Component2());
                 }
                 cmd.Playback().Dispose();
             }
@@ -72,26 +71,10 @@ namespace Ecs.CSharp.Benchmark
 
         [BenchmarkCategory(Categories.Myriad)]
         [Benchmark]
-        public void Myriad_MultiThread()
-        {
-            World world = _myriad.World;
-            world.ExecuteParallel<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
         public void Myriad_SingleThreadChunk()
         {
             World world = _myriad.World;
             world.ExecuteChunk<MyriadForEach2, Component1, Component2>();
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThreadChunk()
-        {
-            World world = _myriad.World;
-            world.ExecuteChunkParallel<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -112,7 +95,7 @@ namespace Ecs.CSharp.Benchmark
         {
             World world = _myriad.World;
 
-            world.Query((ref Component1 c1, ref Component1 c2) =>
+            world.Query(static (ref Component1 c1, ref Component2 c2) =>
             {
                 c1.Value += c2.Value;
             });

@@ -50,12 +50,11 @@ namespace Ecs.CSharp.Benchmark
             // always sequential in memory no matter what else is attached to the entity. So no need to respect
             // the padding input
             public MyriadContext(int entityCount, int _)
-                : base()
             {
                 CommandBuffer cmd = new CommandBuffer(World);
                 for (int i = 0; i < entityCount; i++)
                 {
-                    CommandBuffer.BufferedEntity e = cmd.Create().Set(new Component1());
+                    cmd.Create().Set(new Component1());
                 }
 
                 cmd.Playback().Dispose();
@@ -74,26 +73,10 @@ namespace Ecs.CSharp.Benchmark
 
         [BenchmarkCategory(Categories.Myriad)]
         [Benchmark]
-        public void Myriad_MultiThread()
-        {
-            World world = _myriad.World;
-            world.ExecuteParallel<MyriadForEach1, Component1>(new MyriadForEach1());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
         public void Myriad_SingleThreadChunk()
         {
             World world = _myriad.World;
             world.ExecuteChunk<MyriadForEach1, Component1>();
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThreadChunk()
-        {
-            World world = _myriad.World;
-            world.ExecuteChunkParallel<MyriadForEach1, Component1>(new MyriadForEach1());
         }
 
         [BenchmarkCategory(Categories.Myriad)]
