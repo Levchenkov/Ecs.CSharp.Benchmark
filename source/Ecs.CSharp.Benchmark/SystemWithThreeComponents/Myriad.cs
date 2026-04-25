@@ -20,7 +20,7 @@ namespace Ecs.CSharp.Benchmark
                 t0.Value += t1.Value + t2.Value;
             }
 
-            public void Execute(ChunkHandle chunk, ReadOnlySpan<Entity> e, Span<Component1> t0, Span<Component2> t1, Span<Component3> t2)
+            public void Execute(ChunkHandle chunk, Span<Component1> t0, Span<Component2> t1, Span<Component3> t2)
             {
                 for (int i = 0; i < t0.Length; i++)
                 {
@@ -35,12 +35,11 @@ namespace Ecs.CSharp.Benchmark
             // always sequential in memory no matter what else is attached to the entity. So no need to respect
             // the padding input
             public MyriadContext(int entityCount, int _)
-                : base()
             {
                 CommandBuffer cmd = new CommandBuffer(World);
                 for (int i = 0; i < entityCount; i++)
                 {
-                    CommandBuffer.BufferedEntity e = cmd.Create().Set(new Component1()).Set(new Component2()).Set(new Component3());
+                    cmd.Create().Set(new Component1()).Set(new Component2()).Set(new Component3());
                 }
                 cmd.Playback().Dispose();
             }
@@ -54,15 +53,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThread()
         {
             World world = _myriad.World;
-            world.Execute<MyriadForEach3, Component1, Component2, Component3>(new MyriadForEach3());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThread()
-        {
-            World world = _myriad.World;
-            world.ExecuteParallel<MyriadForEach3, Component1, Component2, Component3>(new MyriadForEach3());
+            world.Execute<MyriadForEach3, Component1, Component2, Component3>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -70,15 +61,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThreadChunk()
         {
             World world = _myriad.World;
-            world.ExecuteChunk<MyriadForEach3, Component1, Component2, Component3>(new MyriadForEach3());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThreadChunk()
-        {
-            World world = _myriad.World;
-            world.ExecuteChunkParallel<MyriadForEach3, Component1, Component2, Component3>(new MyriadForEach3());
+            world.ExecuteChunk<MyriadForEach3, Component1, Component2, Component3>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -99,7 +82,7 @@ namespace Ecs.CSharp.Benchmark
         {
             World world = _myriad.World;
 
-            world.Query((ref Component1 c1, ref Component1 c2, ref Component1 c3) =>
+            world.Query(static (ref Component1 c1, ref Component2 c2, ref Component3 c3) =>
             {
                 c1.Value += c2.Value + c3.Value;
             });

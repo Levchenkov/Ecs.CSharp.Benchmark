@@ -21,7 +21,7 @@ namespace Ecs.CSharp.Benchmark
                 t0.Value += t1.Value;
             }
 
-            public void Execute(ChunkHandle chunk, ReadOnlySpan<Entity> e, Span<Component1> t0, Span<Component2> t1)
+            public void Execute(ChunkHandle chunk, Span<Component1> t0, Span<Component2> t1)
             {
                 for (int i = 0; i < t0.Length; i++)
                 {
@@ -45,7 +45,6 @@ namespace Ecs.CSharp.Benchmark
         private sealed class MyriadContext : MyriadBaseContext
         {
             public MyriadContext(int entityCount)
-                : base()
             {
                 CommandBuffer cmd = new CommandBuffer(World);
                 for (int i = 0; i < entityCount; i++)
@@ -84,15 +83,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThread()
         {
             World world = _myriad.World;
-            world.Execute<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThread()
-        {
-            World world = _myriad.World;
-            world.ExecuteParallel<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
+            world.Execute<MyriadForEach2, Component1, Component2>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -100,15 +91,7 @@ namespace Ecs.CSharp.Benchmark
         public void Myriad_SingleThreadChunk()
         {
             World world = _myriad.World;
-            world.ExecuteChunk<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
-        }
-
-        [BenchmarkCategory(Categories.Myriad)]
-        [Benchmark]
-        public void Myriad_MultiThreadChunk()
-        {
-            World world = _myriad.World;
-            world.ExecuteChunkParallel<MyriadForEach2, Component1, Component2>(new MyriadForEach2());
+            world.ExecuteChunk<MyriadForEach2, Component1, Component2>();
         }
 
         [BenchmarkCategory(Categories.Myriad)]
@@ -129,7 +112,7 @@ namespace Ecs.CSharp.Benchmark
         {
             World world = _myriad.World;
 
-            world.Query((ref Component1 c1, ref Component1 c2) =>
+            world.Query(static (ref Component1 c1, ref Component2 c2) =>
             {
                 c1.Value += c2.Value;
             });
