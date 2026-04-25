@@ -7,7 +7,7 @@ namespace Ecs.CSharp.Benchmark
     {
         [Context] private readonly HypEcsBaseContext _hypEcs;
 
-        [BenchmarkCategory(Categories.RelEcs)]
+        [BenchmarkCategory(Categories.HypEcs)]
         [Benchmark]
         public void HypEcs()
         {
